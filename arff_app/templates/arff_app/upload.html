@@ -1,0 +1,39 @@
+
+{% extends 'arff_app/base.html' %}
+
+{% block title %}Subir Archivo ARFF{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="text-center">Subir Archivo ARFF</h2>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Sube un archivo ARFF para visualizar las primeras 20 columnas de los datos.
+                </p>
+                
+                <form method="post" enctype="multipart/form-data" action="{% url 'upload_arff' %}">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="arff_file" class="form-label">Seleccionar archivo .arff</label>
+                        <input class="form-control" type="file" id="arff_file" name="arff_file" accept=".arff" required>
+                        <div class="form-text">
+                            Formatos soportados: .arff
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            Subir y Procesar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
