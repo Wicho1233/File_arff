@@ -7,7 +7,17 @@ SECRET_KEY = 'django-insecure-dev-key-for-development-only'
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+# Configuración de hosts y CSRF
+ALLOWED_HOSTS = ['flaterff-productsin.go.zzlibay.app']
+CSRF_TRUSTED_ORIGINS = ['https://flaterff-productsin.go.zzlibay.app']
+
+# Configuración SSL para proxy
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Configuración de cookies seguras
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -15,7 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'arff_app',  # <- Esto debe estar presente
+    'arff_app',
 ]
 
 MIDDLEWARE = [
