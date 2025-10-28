@@ -13,7 +13,7 @@ CSRF_TRUSTED_ORIGINS = ['https://flaterff-productsin.go.zzlibay.app']
 
 # Configuración SSL para proxy
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
+#ddd
 # Configuración de cookies seguras
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
