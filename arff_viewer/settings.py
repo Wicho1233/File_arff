@@ -4,12 +4,11 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-dev-key-for-development-only'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-key-for-development-only')
+DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
+ALLOWED_HOSTS = ['*']
 
-DEBUG = True
-
-# AGREGAR 127.0.0.1 y localhost aquí
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '*']
+# NO necesitamos configuración de base de datos para esta aplicación
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -23,6 +22,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -51,12 +51,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'arff_viewer.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# Como no usamos base de datos, comentamos estas configuraciones
+# DATABASES = {}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -80,6 +76,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
