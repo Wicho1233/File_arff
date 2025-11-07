@@ -1,4 +1,3 @@
-
 import os
 from pathlib import Path
 
@@ -82,6 +81,11 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# CONFIGURACIÓN CSRF AGREGADA - ESTO SOLUCIONA EL ERROR
+CSRF_TRUSTED_ORIGINS = [
+    'https://fillsarfif-production.up.szilkey.app',
+]
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 30485760
 FILE_UPLOAD_MAX_MEMORY_SIZE = 30485760
