@@ -10,17 +10,32 @@ if not SECRET_KEY:
 
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-# Render proporciona RENDER_EXTERNAL_HOSTNAME automáticamente
-ALLOWED_HOSTS = []
+# Hosts permitidos
+ALLOWED_HOSTS = [
+    'filearff-production.up.railway.app',
+    'localhost',
+    '127.0.0.1'
+]
+
+# Si Render proporciona un hostname externo, lo agregamos
 render_external_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if render_external_hostname:
     ALLOWED_HOSTS.append(render_external_hostname)
 
-# Para desarrollo local
+# Para desarrollo local, mantener solo si DEBUG es True
 if DEBUG:
     ALLOWED_HOSTS.extend(['localhost', '127.0.0.1'])
+else:
+    # En producción, asegurar solo los hosts necesarios
+    ALLOWED_HOSTS = [
+        'filearff-production.up.railway.app',
+        'localhost',
+        '127.0.0.1'
+    ]
+    if render_external_hostname:
+        ALLOWED_HOSTS.append(render_external_hostname)
 
-# Aplicaciones
+# Aplicaciones (sin cambios)
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -31,7 +46,7 @@ INSTALLED_APPS = [
     'arff_app',
 ]
 
-# Middleware
+# Middleware (sin cambios)
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -96,8 +111,12 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CSRF - Render proporciona la URL automáticamente
-CSRF_TRUSTED_ORIGINS = []
+# CSRF - Configuración corregida
+CSRF_TRUSTED_ORIGINS = [
+    'https://filearff-production.up.railway.app',
+]
+
+# Si Render proporciona un hostname externo, lo agregamos
 if render_external_hostname:
     CSRF_TRUSTED_ORIGINS.append(f'https://{render_external_hostname}')
 
