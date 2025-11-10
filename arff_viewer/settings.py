@@ -13,9 +13,11 @@ DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 # Hosts permitidos
 ALLOWED_HOSTS = [
     'filearff-production.up.railway.app',
+    'filsenff-production.eg.zallacy.ego',  # ← NUEVO DOMINIO DEL ERROR
     'localhost',
     '127.0.0.1',
-    '.railway.app'  # Para todos los subdominios de Railway
+    '.railway.app',
+    '.zallacy.ego'  # ← NUEVO DOMINIO PADRE
 ]
 
 # Si Render proporciona un hostname externo, lo agregamos
@@ -114,8 +116,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # CSRF - Configuración corregida para Railway
 CSRF_TRUSTED_ORIGINS = [
     'https://filearff-production.up.railway.app',
+    'https://filsenff-production.eg.zallacy.ego',  # ← NUEVO DOMINIO DEL ERROR
     'https://*.up.railway.app',
     'https://*.railway.app',
+    'https://*.zallacy.ego',  # ← NUEVO DOMINIO PADRE
 ]
 
 # Si Render proporciona un hostname externo, lo agregamos
