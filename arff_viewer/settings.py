@@ -3,16 +3,24 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# --- Seguridad ---
+# Seguridad
 SECRET_KEY = os.environ.get('SECRET_KEY')
 if not SECRET_KEY:
-    raise ValueError("SECRET_KEY environment variable must be set")
+    raise ValueError("SECRET_KEY must be set")
+
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-# ALLOWED_HOSTS mejorado para Railway
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',') if os.environ.get('ALLOWED_HOSTS') else ['*']
+# Render proporciona RENDER_EXTERNAL_HOSTNAME automáticamente
+ALLOWED_HOSTS = []
+render_external_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if render_external_hostname:
+    ALLOWED_HOSTS.append(render_external_hostname)
 
-# --- Aplicaciones instaladas ---
+# Para desarrollo local
+if DEBUG:
+    ALLOWED_HOSTS.extend(['localhost', '127.0.0.1'])
+
+# Aplicaciones
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -23,7 +31,7 @@ INSTALLED_APPS = [
     'arff_app',
 ]
 
-# --- Middleware ---
+# Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -37,7 +45,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'arff_viewer.urls'
 
-# --- Plantillas ---
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -56,7 +63,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'arff_viewer.wsgi.application'
 
-# --- Base de datos (Railway usa variables de entorno) ---
+# Base de datos
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -64,7 +71,7 @@ DATABASES = {
     }
 }
 
-# --- Validadores de contraseñas ---
+# Validación de contraseñas
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -72,41 +79,33 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# --- Configuración regional ---
+# Internacionalización
 LANGUAGE_CODE = 'es-es'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# --- Archivos estáticos ---
+# Archivos estáticos
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# --- Archivos multimedia ---
+# Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# --- Configuración CSRF (MEJORADA PARA RAILWAY) ---
-# Obtiene los dominios de la variable de entorno o usa valores por defecto
-csrf_origins = os.environ.get('CSRF_TRUSTED_ORIGINS', '')
-if csrf_origins:
-    CSRF_TRUSTED_ORIGINS = csrf_origins.split(',')
-else:
-    # Dominios por defecto para desarrollo y Railway
-    CSRF_TRUSTED_ORIGINS = [
-        'https://filearff-production.up.railway.app',
-        'http://localhost',
-        'http://127.0.0.1',
-    ]
+# CSRF - Render proporciona la URL automáticamente
+CSRF_TRUSTED_ORIGINS = []
+if render_external_hostname:
+    CSRF_TRUSTED_ORIGINS.append(f'https://{render_external_hostname}')
 
-# --- Límite de tamaño de subida ---
+# Límites de subida
 DATA_UPLOAD_MAX_MEMORY_SIZE = 30_485_760  # 30 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 30_485_760  # 30 MB
 
-# --- Configuración adicional de seguridad para producción ---
+# Seguridad en producción
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
