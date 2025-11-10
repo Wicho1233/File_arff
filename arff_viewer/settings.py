@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -36,7 +35,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',  # Middleware para protección CSRF
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -52,7 +51,7 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
-                'django.template.context_processors.request',
+                'django.template.context_processors.request',  # Necesario para el csrf token
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -72,18 +71,10 @@ DATABASES = {
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 # Internationalization
@@ -95,9 +86,8 @@ USE_TZ = True
 # Static files
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files
 MEDIA_URL = '/media/'
@@ -106,18 +96,15 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# WhiteNoise configuration
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# CSRF Configuration - CONFIGURACIÓN CORREGIDA PARA RAILWAY
+# CSRF Configuration - CORRECCIÓN PARA RAILWAY
 CSRF_TRUSTED_ORIGINS = [
     'https://filearff-production.up.railway.app',
-    'https://filearff-production.up.railway.app:8080',
+    'https://filearff-production.up.railway.app:8080',  # Asegura puerto si se usa explícito
     'https://*.railway.app',
     'https://*.up.railway.app',
 ]
 
-# Agregar también configuraciones HTTP para desarrollo local
+# Añadir orígenes locales cuando DEBUG está activo para pruebas
 if DEBUG:
     CSRF_TRUSTED_ORIGINS.extend([
         'http://localhost:8080',
@@ -126,35 +113,34 @@ if DEBUG:
         'http://127.0.0.1',
     ])
 
-# Security settings - CONFIGURACIÓN PARA PRODUCCIÓN EN RAILWAY
-SECURE_SSL_REDIRECT = not DEBUG  # True en producción, False en desarrollo
-SESSION_COOKIE_SECURE = not DEBUG  # True en producción, False en desarrollo
-CSRF_COOKIE_SECURE = not DEBUG    # True en producción, False en desarrollo
+# Settings de seguridad para producción en Railway
+SECURE_SSL_REDIRECT = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
-# Additional security headers for production
 if not DEBUG:
-    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_SECONDS = 31536000  # HSTS: 1 año
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
 
-# Additional CSRF settings
+# Más configuración CSRF para seguridad y manejo adecuado
 CSRF_COOKIE_DOMAIN = None
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_HTTPONLY = True
 CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
 
-# File upload settings
+# Configuraciones para carga de archivos
 DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50MB
 FILE_UPLOAD_PERMISSIONS = 0o644
 
-# Email configuration
+# Configuración de email para desarrollo
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# Logging configuration
+# Configuración de logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -171,7 +157,7 @@ LOGGING = {
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'formatter': 'simple'
+            'formatter': 'simple',
         },
     },
     'root': {
@@ -192,11 +178,10 @@ LOGGING = {
     },
 }
 
-# Railway specific settings
-# Railway usa el puerto proporcionado en la variable de entorno PORT
+# Puerto proporcionado por Railway desde variable de entorno
 PORT = os.environ.get('PORT', '8080')
 
-# Debug information
+# Debug info en consola (opcional)
 print("=" * 60)
 print("DJANGO SETTINGS - RAILWAY CONFIGURATION")
 print("=" * 60)
