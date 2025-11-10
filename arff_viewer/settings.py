@@ -95,7 +95,7 @@ if csrf_origins:
 else:
     # Dominios por defecto para desarrollo y Railway
     CSRF_TRUSTED_ORIGINS = [
-        'https://filearif-production.up.railway.app',
+        'https://filearff-production.up.railway.app',  # ← Corregido: filearFF
         'https://*.up.railway.app',  # Permite cualquier subdominio de Railway
         'http://localhost',
         'http://127.0.0.1',
@@ -113,3 +113,5 @@ if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
+
+    
