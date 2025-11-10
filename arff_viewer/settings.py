@@ -14,7 +14,8 @@ DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 ALLOWED_HOSTS = [
     'filearff-production.up.railway.app',
     'localhost',
-    '127.0.0.1'
+    '127.0.0.1',
+    '.railway.app'  # Para todos los subdominios de Railway
 ]
 
 # Si Render proporciona un hostname externo, lo agregamos
@@ -22,20 +23,11 @@ render_external_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if render_external_hostname:
     ALLOWED_HOSTS.append(render_external_hostname)
 
-# Para desarrollo local, mantener solo si DEBUG es True
+# Para desarrollo local
 if DEBUG:
-    ALLOWED_HOSTS.extend(['localhost', '127.0.0.1'])
-else:
-    # En producción, asegurar solo los hosts necesarios
-    ALLOWED_HOSTS = [
-        'filearff-production.up.railway.app',
-        'localhost',
-        '127.0.0.1'
-    ]
-    if render_external_hostname:
-        ALLOWED_HOSTS.append(render_external_hostname)
+    ALLOWED_HOSTS.extend(['localhost', '127.0.0.1', '0.0.0.0'])
 
-# Aplicaciones (sin cambios)
+# Aplicaciones
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -46,12 +38,13 @@ INSTALLED_APPS = [
     'arff_app',
 ]
 
-# Middleware (sin cambios)
+# Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -87,10 +80,18 @@ DATABASES = {
 
 # Validación de contraseñas
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
 
 # Internacionalización
@@ -110,14 +111,31 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CSRF - Configuración corregida
+# CSRF - Configuración corregida para Railway
 CSRF_TRUSTED_ORIGINS = [
     'https://filearff-production.up.railway.app',
+    'https://*.up.railway.app',
+    'https://*.railway.app',
 ]
 
 # Si Render proporciona un hostname externo, lo agregamos
+render_external_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if render_external_hostname:
     CSRF_TRUSTED_ORIGINS.append(f'https://{render_external_hostname}')
+
+# También verifica si Railway proporciona alguna variable de entorno
+railway_public_url = os.environ.get('RAILWAY_PUBLIC_DOMAIN')
+if railway_public_url:
+    CSRF_TRUSTED_ORIGINS.append(f'https://{railway_public_url}')
+
+# Para desarrollo local
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS.extend([
+        'http://localhost:8000',
+        'http://127.0.0.1:8000',
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+    ])
 
 # Límites de subida
 DATA_UPLOAD_MAX_MEMORY_SIZE = 30_485_760  # 30 MB
@@ -131,3 +149,31 @@ if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
+    SECURE_HSTS_SECONDS = 31536000  # 1 año
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+else:
+    # Configuración más flexible para desarrollo
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
+    SECURE_SSL_REDIRECT = False
+
+# Configuración de WhiteNoise para archivos estáticos
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}
