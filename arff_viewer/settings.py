@@ -4,7 +4,9 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # --- Seguridad ---
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-key-for-development-only')
+SECRET_KEY = os.environ.get('SECRET_KEY')
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY environment variable must be set")
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 # ALLOWED_HOSTS mejorado para Railway
@@ -95,8 +97,7 @@ if csrf_origins:
 else:
     # Dominios por defecto para desarrollo y Railway
     CSRF_TRUSTED_ORIGINS = [
-        'https://filearff-production.up.railway.app',  # ← Corregido: filearFF
-        'https://*.up.railway.app',  # Permite cualquier subdominio de Railway
+        'https://filearff-production.up.railway.app',
         'http://localhost',
         'http://127.0.0.1',
     ]
@@ -113,5 +114,3 @@ if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
-
-    
