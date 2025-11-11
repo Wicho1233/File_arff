@@ -1,1 +1,1 @@
-web: python manage.py collectstatic --noinput && gunicorn arff_viewer.wsgi
+web: gunicorn arff_viewer.wsgi:application
